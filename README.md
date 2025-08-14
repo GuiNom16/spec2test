@@ -2,6 +2,8 @@
 
 An AI-powered tool that automatically generates test cases from software requirements documents (PDF/DOCX).
 
+**Created by Jeremie Nombro**
+
 ## Features
 
 - 📄 **Multi-format Support**: Upload PDF or DOCX requirement documents
@@ -107,6 +109,49 @@ To use a different Ollama model:
 ## Contributing
 
 This is a lite version focused on core functionality. For advanced features, check out the full Spec2Test project.
+
+## Pro Version Features
+
+The full commercial version will include advanced features such as:
+
+- **Advanced Prompts**: Specialized prompts per requirement type (functional, non-functional, UI, etc.)
+- **Prompt Chaining**: Multi-step processing for better accuracy and context understanding
+- **Semantic Search**: Intelligent search across requirements and test cases
+- **Version Comparison**: Track changes between document versions and show test case evolution
+- **Multi-Format Export**: Excel with formatting, Jira-ready CSV, and other enterprise formats
+- **Authentication System**: Optional user management for hosted deployments
+- **Custom Solutions**: Tailored versions for each client's specific requirements and workflows
+
+## Who Can Benefit
+
+Spec2Test Lite serves diverse users with different needs and security requirements:
+
+### **For Privacy-Conscious Organizations**
+
+- **Legal Firms**: Process legal requirements and contracts without exposing confidential information to third-party AI services
+- **Healthcare Providers**: Handle HIPAA-compliant medical software specifications with local processing
+- **Financial Institutions**: Process banking and fintech requirements while maintaining regulatory compliance
+- **Government Agencies**: Handle classified or sensitive government software requirements
+- **R&D Departments**: Protect proprietary business logic and trade secrets during test case generation
+
+### **For Development Teams**
+
+- **Software Developers**: Generate test cases from technical specifications and user stories
+- **QA Engineers**: Automate test planning for complex software systems
+- **Product Managers**: Transform requirement documents into actionable testing frameworks
+- **DevOps Teams**: Integrate test case generation into CI/CD pipelines
+
+### **For Training & Education**
+
+- **Software Testing Trainers**: Generate test scenarios for training programs
+- **Students**: Learn test case design from real requirements
+- **Bootcamps**: Provide hands-on experience with AI-powered testing tools
+
+### **For Compliance & Audit**
+
+- **Compliance Officers**: Create audit trails and compliance verification test cases
+- **Auditors**: Generate systematic test cases for regulatory reviews
+- **Risk Managers**: Ensure comprehensive coverage of requirement testing
 
 ## License
 

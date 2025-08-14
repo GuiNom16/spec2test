@@ -15,7 +15,6 @@ Transform your software requirements documents into comprehensive test cases usi
 Upload a PDF or DOCX file and get structured test cases ready for your testing team.
 """)
 
-# File upload section
 st.subheader("📄 Upload Requirements Document")
 uploaded_file = st.file_uploader(UPLOAD_LABEL, type=["docx", "pdf"], help="Supported formats: PDF, DOCX")
 
@@ -25,11 +24,8 @@ if uploaded_file:
         f.write(uploaded_file.read())
 
     try:
-        # Parse and clean text to remove intro/TOC
         text = parse_file(file_path)
         cleaned_text = clean_text(text)
-
-        # Chunk cleaned text for LLM input
         chunks = chunk_text(cleaned_text, max_chars=CHUNK_SIZE)
         
         if not chunks:
@@ -60,25 +56,18 @@ if uploaded_file:
             status_text.text("🎉 Processing complete!")
             progress_bar.empty()
 
-            # Keep only non-empty DataFrames
             non_empty_dfs = [df for df in all_dfs if df is not None and not df.empty]
 
             if non_empty_dfs:
-                # Combine all DataFrames from chunks
                 result_df = pd.concat(non_empty_dfs, ignore_index=True)
-
-                # Clean test cases: keep rows with non-empty Title
                 result_df = clean_test_cases_df(result_df)
 
                 if not result_df.empty:
-                    # Add sequential IDs locally since AI no longer provides them
                     result_df = add_test_case_ids(result_df)
 
-                    # Display the results
                     st.subheader("📋 Generated Test Cases")
                     st.success(f"✅ Successfully generated {len(result_df)} test cases!")
                     
-                    # Show summary stats
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.metric("Total Test Cases", len(result_df))
@@ -89,7 +78,6 @@ if uploaded_file:
                     
                     st.dataframe(result_df, use_container_width=True)
 
-                    # Prepare CSV for download
                     csv_buffer = io.StringIO()
                     result_df.to_csv(csv_buffer, index=False, sep=CSV_SEPARATOR)
                     csv_data = csv_buffer.getvalue()
@@ -112,6 +100,5 @@ if uploaded_file:
         st.info("💡 Make sure Ollama is running and you have the llama3 model installed.")
     
     finally:
-        # Clean up temporary file
         if os.path.exists(file_path):
             os.remove(file_path)

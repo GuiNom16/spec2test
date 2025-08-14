@@ -40,7 +40,11 @@ def parse_llm_csv_output(output_text):
     # Keep only lines that have exactly one separator
     lines = csv_text.splitlines()
     filtered_lines = [lines[0]]  # header
+    
     for line in lines[1:]:
+        if re.search(r'ID:\s*Title:\s*Title\s*Description:\s*Description', line, re.IGNORECASE):
+            continue
+            
         # Count separators; accept line only if exactly one separator (meaning 2 columns)
         if line.count(CSV_SEPARATOR) == 1:
             filtered_lines.append(line)

@@ -10,7 +10,14 @@ from config.settings import *
 
 st.title(APP_TITLE)
 
-uploaded_file = st.file_uploader(UPLOAD_LABEL, type=["docx", "pdf"])
+st.markdown("""
+Transform your software requirements documents into comprehensive test cases using AI. 
+Upload a PDF or DOCX file and get structured test cases ready for your testing team.
+""")
+
+# File upload section
+st.subheader("📄 Upload Requirements Document")
+uploaded_file = st.file_uploader(UPLOAD_LABEL, type=["docx", "pdf"], help="Supported formats: PDF, DOCX")
 
 if uploaded_file:
     file_path = f"{TEMP_FILE_PREFIX}{uploaded_file.name}"
@@ -26,24 +33,31 @@ if uploaded_file:
         chunks = chunk_text(cleaned_text, max_chars=CHUNK_SIZE)
         
         if not chunks:
-            st.error("No content could be extracted from the document.")
+            st.error("❌ No content could be extracted from the document.")
+            st.info("💡 Make sure your document contains readable text and is not corrupted.")
         else:
+            st.subheader("🔄 Processing Document")
+            st.info(f"📊 Document split into {len(chunks)} sections for analysis")
             all_dfs = []
             progress_bar = st.progress(0)
             status_text = st.empty()
             
             for i, chunk in enumerate(chunks):
-                status_text.text(f"Processing chunk {i+1}/{len(chunks)}...")
+                status_text.text(f"🤖 Analyzing requirements chunk {i+1}/{len(chunks)}...")
+                
                 prompt = get_prompt(chunk)
                 output = run_llm(prompt)
-                
                 df = parse_llm_csv_output(output)
+                
                 if df is not None and not df.empty:
                     all_dfs.append(df)
+                    status_text.text(f"✅ Found {len(df)} test cases in chunk {i+1}")
+                else:
+                    status_text.text(f"📝 No test cases found in chunk {i+1}")
                 
                 progress_bar.progress((i + 1) / len(chunks))
             
-            status_text.text("Processing complete!")
+            status_text.text("🎉 Processing complete!")
             progress_bar.empty()
 
             # Keep only non-empty DataFrames
@@ -61,19 +75,32 @@ if uploaded_file:
                     result_df = add_test_case_ids(result_df)
 
                     # Display the results
-                    st.success(f"✅ Generated {len(result_df)} test cases!")
-                    st.dataframe(result_df)
+                    st.subheader("📋 Generated Test Cases")
+                    st.success(f"✅ Successfully generated {len(result_df)} test cases!")
+                    
+                    # Show summary stats
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("Total Test Cases", len(result_df))
+                    with col2:
+                        st.metric("Average Title Length", f"{result_df['Title'].str.len().mean():.0f} chars")
+                    with col3:
+                        st.metric("Average Description Length", f"{result_df['Description'].str.len().mean():.0f} chars")
+                    
+                    st.dataframe(result_df, use_container_width=True)
 
                     # Prepare CSV for download
                     csv_buffer = io.StringIO()
                     result_df.to_csv(csv_buffer, index=False, sep=CSV_SEPARATOR)
                     csv_data = csv_buffer.getvalue()
 
+                    st.subheader("💾 Download Results")
                     st.download_button(
-                        "📥 Download CSV", 
+                        "📥 Download Test Cases as CSV", 
                         data=csv_data, 
                         file_name=CSV_FILENAME, 
-                        mime="text/csv"
+                        mime="text/csv",
+                        help="Download the generated test cases in CSV format for import into test management tools"
                     )
                 else:
                     st.warning("⚠️ No valid test cases could be extracted from the model output.")

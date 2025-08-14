@@ -4,14 +4,27 @@ import io
 import re
 
 
-def run_llm(prompt, model="llama3"):
+from config.settings import DEFAULT_MODEL, TIMEOUT_SECONDS
+
+def run_llm(prompt, model=DEFAULT_MODEL):
     cmd = [
         "ollama", "run", model, prompt
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='ignore')
-    return result.stdout.strip()
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='ignore', timeout=TIMEOUT_SECONDS)
+        if result.returncode != 0:
+            raise Exception(f"Ollama command failed: {result.stderr}")
+        return result.stdout.strip()
+    except subprocess.TimeoutExpired:
+        raise Exception("LLM request timed out. Try with a smaller document or different model.")
+    except FileNotFoundError:
+        raise Exception("Ollama not found. Please install Ollama and ensure it's in your PATH.")
+    except Exception as e:
+        raise Exception(f"Error running LLM: {str(e)}")
 
+
+from config.settings import CSV_SEPARATOR
 
 def parse_llm_csv_output(output_text):
     output_text = output_text.strip()
@@ -24,12 +37,12 @@ def parse_llm_csv_output(output_text):
     csv_text = csv_match.group(1).strip()
 
     # Remove any trailing notes or lines that do not look like CSV rows
-    # Keep only lines that have exactly one '|' separator
+    # Keep only lines that have exactly one separator
     lines = csv_text.splitlines()
     filtered_lines = [lines[0]]  # header
     for line in lines[1:]:
-        # Count pipes; accept line only if exactly one pipe (meaning 2 columns)
-        if line.count("|") == 1:
+        # Count separators; accept line only if exactly one separator (meaning 2 columns)
+        if line.count(CSV_SEPARATOR) == 1:
             filtered_lines.append(line)
         else:
             # Stop parsing once non-CSV row encountered (e.g., notes)
@@ -38,7 +51,7 @@ def parse_llm_csv_output(output_text):
     csv_text_clean = "\n".join(filtered_lines)
 
     try:
-        df = pd.read_csv(io.StringIO(csv_text_clean), sep="|")
+        df = pd.read_csv(io.StringIO(csv_text_clean), sep=CSV_SEPARATOR)
         if {"Title", "Description"}.issubset(df.columns):
             df = df[["Title", "Description"]]
 

@@ -1,13 +1,15 @@
+from config.settings import CSV_SEPARATOR
+
 def get_prompt(requirements_text):
     return f"""
 You are an AI assistant that extracts software test cases from the provided requirements.
 
-Output ONLY a valid CSV table with exactly two columns separated by a pipe "|":
+Output ONLY a valid CSV table with exactly two columns separated by a pipe "{CSV_SEPARATOR}":
 
-Title|Description
+Title{CSV_SEPARATOR}Description
 
 RULES:
-- The header row must be exactly: Title|Description
+- The header row must be exactly: Title{CSV_SEPARATOR}Description
 - Each row must contain one meaningful test case Title and a full Description
 - Titles or Descriptions cannot be empty or placeholders like "-" or "N/A"
 - Do NOT include any IDs, numbering, bullet points, notes, explanations, or extra text
@@ -45,8 +47,8 @@ Editor Cannot Automate Incomplete or Unreviewed Articles|The system prevents the
 
 Example when no test cases found (output exactly this, nothing more):
 
-Title|Description
--|-
+Title{CSV_SEPARATOR}Description
+-{CSV_SEPARATOR}-
 
 Now extract test cases from the following requirements and output ONLY the CSV in the above format:
 

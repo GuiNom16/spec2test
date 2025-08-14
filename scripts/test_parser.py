@@ -1,12 +1,16 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pandas as pd
 from core.generator import parse_llm_csv_output
 
 
 def run_samples():
     samples = [
-        "Title,Description\nLogin works,User can login\nLogout works,User can logout",
-        "ID,Title,Description\n1,Login works,User can login\n2,Logout works,User can logout",
-        "Some preface text...\nTitle,Description\nA,B\nC,D\nSome epilogue text",
+        "Title|Description\nLogin works|User can login\nLogout works|User can logout",
+        "ID|Title|Description\n1|Login works|User can login\n2|Logout works|User can logout",
+        "Some preface text...\nTitle|Description\nA|B\nC|D\nSome epilogue text",
         "No CSV here",
         "",
     ]
